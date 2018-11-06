@@ -5,11 +5,12 @@ The PyV8 library has been built with the following assumptions:
 - The Google "depot tools" used for setup V8 will be cloned under the folder `/usr/local/src/depot_tools`
 - The Google V8 repository will be cloned under the folder `/usr/local/src/v8-compiling-folder/v8`
 - This PyV8 repository will be cloned into `/usr/local/src/pyv8`
+- PyV8 will be built with Python2
 
 
 ### APT PACKAGES
 ```
-# apt-get install git g++ gcc libboost-dev libboost-system-dev libboost-python-dev libboost-filesystem-dev libboost-log-dev libboost-regex-dev libboost-thread-dev libboost-timer-dev libboost-serialization-dev libboost-iostreams-dev libboost-atomic-dev libboost-chrono-dev
+# apt-get install python-dev git g++ gcc libboost-dev libboost-system-dev libboost-python-dev libboost-filesystem-dev libboost-log-dev libboost-regex-dev libboost-thread-dev libboost-timer-dev libboost-serialization-dev libboost-iostreams-dev libboost-atomic-dev libboost-chrono-dev
 ```
 
 
