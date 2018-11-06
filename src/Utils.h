@@ -119,11 +119,13 @@ namespace py = boost::python;
 
 #endif
 
-v8::Handle<v8::String> ToString(const std::string &str, v8::Isolate *isolate = v8::Isolate::GetCurrent());
-v8::Handle<v8::String> ToString(const std::wstring &str, v8::Isolate *isolate = v8::Isolate::GetCurrent());
-v8::Handle<v8::String> ToString(py::object str, v8::Isolate *isolate = v8::Isolate::GetCurrent());
+v8::Isolate *util_get_isolate( void );
 
-v8::Handle<v8::String> DecodeUtf8(const std::string &str, v8::Isolate *isolate = v8::Isolate::GetCurrent());
+v8::Handle<v8::String> ToString(const std::string &str, v8::Isolate *isolate = util_get_isolate());
+v8::Handle<v8::String> ToString(const std::wstring &str, v8::Isolate *isolate = util_get_isolate());
+v8::Handle<v8::String> ToString(py::object str, v8::Isolate *isolate = util_get_isolate());
+
+v8::Handle<v8::String> DecodeUtf8(const std::string &str, v8::Isolate *isolate = util_get_isolate());
 const std::string EncodeUtf8(const std::wstring &str);
 
 struct CPythonGIL

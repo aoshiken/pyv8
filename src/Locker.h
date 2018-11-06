@@ -12,7 +12,7 @@ class CLocker
   CIsolateWrapperPtr m_isolate;
 
 public:
-  CLocker() : m_isolate(new CIsolate(v8::Isolate::GetCurrent())) {}
+  CLocker() : m_isolate(new CIsolate( util_get_isolate() )) {}
   CLocker(CIsolateWrapperPtr isolate) : m_isolate(isolate)
   {
   }
@@ -21,7 +21,7 @@ public:
   void enter(void);
   void leave(void);
 
-  bool IsLocked();
+  static bool IsLocked();
 
   static void Expose(void);
 };
@@ -37,7 +37,7 @@ public:
   {
     Py_BEGIN_ALLOW_THREADS
 
-        m_unlocker.reset(new v8::Unlocker(v8::Isolate::GetCurrent()));
+        m_unlocker.reset(new v8::Unlocker( util_get_isolate()));
 
     Py_END_ALLOW_THREADS
   }

@@ -24,7 +24,7 @@ class CDebug
 
   void Init(void);
 public:
-  CDebug(v8::Isolate *isolate = NULL) : m_isolate(isolate ? isolate : v8::Isolate::GetCurrent()), m_enabled(false)
+  CDebug(v8::Isolate *isolate = NULL) : m_isolate(isolate ? isolate : util_get_isolate()), m_enabled(false)
   {
     Init();
   }

@@ -38,7 +38,7 @@ protected:
   static void ReportFatalError(const char* location, const char* message);
   static void ReportMessage(v8::Handle<v8::Message> message, v8::Handle<v8::Value> data);
 public:
-  CEngine(v8::Isolate *isolate = NULL) : m_isolate(isolate ? isolate : v8::Isolate::GetCurrent()) {}
+  CEngine(v8::Isolate *isolate = NULL) : m_isolate(isolate ? isolate : util_get_isolate()) {}
 
   CScriptPtr Compile(const std::string& src, const std::string name = std::string(), int line = -1, int col = -1)
   {

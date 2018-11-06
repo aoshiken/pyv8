@@ -70,7 +70,7 @@ protected:
 
 public:
   CJavascriptObject(v8::Handle<v8::Object> obj)
-      : m_obj(v8::Isolate::GetCurrent(), obj)
+      : m_obj(util_get_isolate(), obj)
   {
   }
 
@@ -79,7 +79,7 @@ public:
     m_obj.Reset();
   }
 
-  v8::Local<v8::Object> Object(void) const { return v8::Local<v8::Object>::New(v8::Isolate::GetCurrent(), m_obj); }
+  v8::Local<v8::Object> Object(void) const { return v8::Local<v8::Object>::New(util_get_isolate(), m_obj); }
 
   py::object GetAttr(const std::string &name);
   void SetAttr(const std::string &name, py::object value);
@@ -179,7 +179,7 @@ class CJavascriptFunction : public CJavascriptObject
 
 public:
   CJavascriptFunction(v8::Handle<v8::Object> self, v8::Handle<v8::Function> func)
-      : CJavascriptObject(func), m_self(v8::Isolate::GetCurrent(), self)
+      : CJavascriptObject(func), m_self(util_get_isolate(), self)
   {
   }
 
@@ -188,7 +188,7 @@ public:
     m_self.Reset();
   }
 
-  v8::Handle<v8::Object> Self(void) const { return v8::Local<v8::Object>::New(v8::Isolate::GetCurrent(), m_self); }
+  v8::Handle<v8::Object> Self(void) const { return v8::Local<v8::Object>::New(util_get_isolate(), m_self); }
 
   static py::object CallWithArgs(py::tuple args, py::dict kwds);
   static py::object CreateWithArgs(CJavascriptFunctionPtr proto, py::tuple args, py::dict kwds);
@@ -256,7 +256,7 @@ public:
   ContextTracer(v8::Handle<v8::Context> ctxt, LivingMap *living);
   ~ContextTracer(void);
 
-  v8::Handle<v8::Context> Context(void) const { return v8::Local<v8::Context>::New(v8::Isolate::GetCurrent(), m_ctxt); }
+  v8::Handle<v8::Context> Context(void) const { return v8::Local<v8::Context>::New(util_get_isolate(), m_ctxt); }
 
   static void Trace(v8::Handle<v8::Context> ctxt, LivingMap *living);
 };

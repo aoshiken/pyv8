@@ -300,7 +300,7 @@ class pyv8_build(build):
     def run(self):
         log.info("run `build` command")
 
-        prepare_v8()
+        #prepare_v8()
 
         build.run(self)
 
@@ -309,7 +309,7 @@ class pyv8_develop(develop):
     def run(self):
         log.info("run `develop` command")
 
-        prepare_v8()
+        #prepare_v8()
 
         develop.run(self)
 

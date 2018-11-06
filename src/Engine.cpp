@@ -324,7 +324,7 @@ void CEngine::CollectAllGarbage(bool force_compaction)
 
 void CEngine::TerminateAllThreads(void)
 {
-  v8::V8::TerminateExecution(v8::Isolate::GetCurrent());
+  v8::V8::TerminateExecution(util_get_isolate());
 }
 
 void CEngine::ReportFatalError(const char* location, const char* message)

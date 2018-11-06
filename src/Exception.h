@@ -11,12 +11,12 @@
 
 #define BEGIN_HANDLE_PYTHON_EXCEPTION try
 #define END_HANDLE_PYTHON_EXCEPTION \
-  catch (const std::exception& ex) { v8::Isolate::GetCurrent()->ThrowException(v8::Exception::Error(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), ex.what()))); } \
-  catch (const py::error_already_set&) { CPythonObject::ThrowIf(v8::Isolate::GetCurrent()); } \
-  catch (...) { v8::Isolate::GetCurrent()->ThrowException(v8::Exception::Error(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "unknown exception"))); }
+  catch (const std::exception& ex) { util_get_isolate()->ThrowException(v8::Exception::Error(v8::String::NewFromUtf8(util_get_isolate(), ex.what()))); } \
+  catch (const py::error_already_set&) { CPythonObject::ThrowIf(util_get_isolate()); } \
+  catch (...) { util_get_isolate()->ThrowException(v8::Exception::Error(v8::String::NewFromUtf8(util_get_isolate(), "unknown exception"))); }
 
 #define BEGIN_HANDLE_JAVASCRIPT_EXCEPTION v8::TryCatch try_catch;
-#define END_HANDLE_JAVASCRIPT_EXCEPTION if (try_catch.HasCaught()) CJavascriptException::ThrowIf(v8::Isolate::GetCurrent(), try_catch);
+#define END_HANDLE_JAVASCRIPT_EXCEPTION if (try_catch.HasCaught()) CJavascriptException::ThrowIf(util_get_isolate(), try_catch);
 
 class CJavascriptException;
 
@@ -137,7 +137,7 @@ protected:
   }
 public:
   CJavascriptException(const std::string& msg, PyObject *type = NULL)
-    : std::runtime_error(msg), m_isolate(v8::Isolate::GetCurrent()), m_type(type)
+    : std::runtime_error(msg), m_isolate(util_get_isolate()), m_type(type)
   {
   }
 

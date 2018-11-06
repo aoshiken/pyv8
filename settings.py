@@ -24,12 +24,12 @@ PYV8_HOME = os.path.abspath(os.path.dirname(__file__))
 BOOST_HOME = None
 BOOST_MT = is_osx
 BOOST_DEBUG = False
-BOOST_STATIC_LINK = True
+BOOST_STATIC_LINK = False
 PYTHON_HOME = None
-V8_HOME = None
+V8_HOME = "/usr/local/src/v8-compiling-folder/v8"
 V8_GIT_URL = "https://chromium.googlesource.com/v8/v8.git"
 V8_GIT_TAG = "5.8.110"  # https://chromium.googlesource.com/v8/v8.git/+/5.8.110
-DEPOT_HOME = None
+DEPOT_HOME = "/usr/local/src/depot_tools"
 DEPOT_GIT_URL = "https://chromium.googlesource.com/chromium/tools/depot_tools.git"
 DEPOT_DOWNLOAD_URL = "https://storage.googleapis.com/chrome-infra/depot_tools.zip"
 
@@ -89,9 +89,10 @@ V8_DEBUG_SYMBOLS = True
 V8_AST = False
 V8_DEBUGGER = False
 
-macros = [
-    ("BOOST_PYTHON_STATIC_LIB", None),
-]
+if BOOST_STATIC_LINK is True:
+    macros = [ ( "BOOST_PYTHON_STATIC_LIB", None ), ]
+else:
+    macros = [ ("BOOST_LOG_DYN_LINK",None ), ]
 
 if V8_DEBUGGER:
     macros += [('SUPPORT_DEBUGGER', None)]
@@ -122,7 +123,7 @@ if BOOST_DEBUG:
 include_dirs = [
     os.path.join(V8_HOME, 'include'),
     V8_HOME,
-    os.path.join(V8_HOME, 'src'),
+    #os.path.join(V8_HOME, 'src'),
 ]
 
 library_dirs = []
@@ -223,6 +224,7 @@ elif is_linux or is_freebsd:
 
     if PYV8_DEBUG:
         extra_compile_args += ['-g', '-O0', '-fno-inline']
+        macros += [("DEBUG", None)]
     else:
         extra_compile_args += ['-g', '-O3']
 
@@ -261,7 +263,7 @@ v8_libs = ['v8', 'v8_libbase', 'v8_libplatform']
 if V8_I18N:
     v8_libs += ['icuuc', 'icui18n']
 
-v8_library_path = "%s/out.gn/%s/" % (V8_HOME, target)
+v8_library_path = "%s/out/%s/lib.target/" % (V8_HOME, target)
 
 libraries += v8_libs
 library_dirs.append(v8_library_path)

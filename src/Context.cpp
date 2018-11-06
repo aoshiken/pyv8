@@ -51,18 +51,15 @@ void CContext::Expose(void)
 
 CContext::CContext(v8::Handle<v8::Context> context, v8::Isolate *isolate) : m_context(isolate, context)
 {
-  BOOST_LOG_SEV(logger(), trace) << "context wrapped";
 }
 
 CContext::CContext(const CContext &context, v8::Isolate *isolate) : m_context(isolate, context.m_context)
 {
-  BOOST_LOG_SEV(logger(), trace) << "context copied";
 }
 
 CContext::CContext(py::object global, py::list extensions, v8::Isolate *isolate)
 {
   v8::HandleScope handle_scope(isolate);
-
   std::auto_ptr<v8::ExtensionConfiguration> cfg;
   std::vector<std::string> ext_names;
   std::vector<const char *> ext_ptrs;
@@ -92,14 +89,10 @@ CContext::CContext(py::object global, py::list extensions, v8::Isolate *isolate)
   {
     if (try_catch.HasCaught())
       CJavascriptException::ThrowIf(isolate, try_catch);
-
-    BOOST_LOG_SEV(CIsolate::Current().Logger(), warning) << "failed to create context";
   }
   else
   {
     m_context.Reset(isolate, context);
-
-    BOOST_LOG_SEV(logger(), trace) << "context created";
 
     if (!global.is_none())
     {
@@ -114,8 +107,9 @@ CContext::CContext(py::object global, py::list extensions, v8::Isolate *isolate)
   }
 }
 
-void CContext::Dispose(bool disposed, v8::Isolate *isolate)
+void CContext::Dispose(void)
 {
+    v8::Isolate *isolate = util_get_isolate();
   if (m_context.IsEmpty())
     return;
 
@@ -123,37 +117,19 @@ void CContext::Dispose(bool disposed, v8::Isolate *isolate)
 
   auto context = m_context.Get(isolate);
 
-  BOOST_LOG_SEV(logger(), trace) << "context " << (disposed ? "disposed" : "destroyed");
-
-  delete GetEmbedderData<logger_t>(context, EmbedderDataFields::LoggerIndex);
-
   m_context.Reset();
-}
-
-logger_t &CContext::GetLogger(v8::Handle<v8::Context> context)
-{
-  auto logger = GetEmbedderData<logger_t>(context, EmbedderDataFields::LoggerIndex, [context]() {
-    auto logger = new logger_t();
-
-    logger->add_attribute(ISOLATE_ATTR, attrs::constant<const v8::Isolate *>(context->GetIsolate()));
-    logger->add_attribute(CONTEXT_ATTR, attrs::constant<const v8::Context *>(*context));
-
-    return logger;
-  });
-
-  return *logger;
 }
 
 py::object CContext::GetGlobal(void) const
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::HandleScope handle_scope( util_get_isolate() );
 
   return CJavascriptObject::Wrap(Context()->Global());
 }
 
 py::str CContext::GetSecurityToken(void) const
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::HandleScope handle_scope( util_get_isolate() );
 
   v8::Handle<v8::Value> token = Context()->GetSecurityToken();
 
@@ -167,41 +143,34 @@ py::str CContext::GetSecurityToken(void) const
 
 void CContext::SetSecurityToken(py::str token)
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::HandleScope handle_scope( util_get_isolate() );
 
   if (token.is_none())
   {
-    BOOST_LOG_SEV(logger(), trace) << "clear security token";
-
     Context()->UseDefaultSecurityToken();
   }
   else
   {
-    BOOST_LOG_SEV(logger(), trace) << "set security token " << py::extract<const char *>(token);
-
-    Context()->SetSecurityToken(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), py::extract<const char *>(token)()));
+    Context()->SetSecurityToken(v8::String::NewFromUtf8( util_get_isolate(), py::extract<const char *>(token)()));
   }
 }
 
 void CContext::Enter(void)
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::HandleScope handle_scope( util_get_isolate() );
 
   Context()->Enter();
-
-  BOOST_LOG_SEV(logger(), trace) << "context entered";
 }
 void CContext::Leave(void)
 {
-  v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+  v8::HandleScope handle_scope( util_get_isolate() );
 
   Context()->Exit();
-
-  BOOST_LOG_SEV(logger(), trace) << "context exited";
 }
 
-py::object CContext::GetEntered(v8::Isolate *isolate)
+py::object CContext::GetEntered( void )
 {
+  v8::Isolate *isolate = util_get_isolate();
   v8::HandleScope handle_scope(isolate);
 
   v8::Handle<v8::Context> entered = isolate->GetEnteredContext();
@@ -231,11 +200,9 @@ py::object CContext::Evaluate(const std::string &src,
                               const std::string name,
                               int line, int col)
 {
-  CEngine engine(v8::Isolate::GetCurrent());
+  CEngine engine( util_get_isolate() );
 
   CScriptPtr script = engine.Compile(src, name, line, col);
-
-  BOOST_LOG_SEV(logger(), trace) << "eval script: " << src;
 
   return script->Run();
 }
@@ -244,11 +211,9 @@ py::object CContext::EvaluateW(const std::wstring &src,
                                const std::string name,
                                int line, int col)
 {
-  CEngine engine(v8::Isolate::GetCurrent());
+  CEngine engine( util_get_isolate() );
 
   CScriptPtr script = engine.CompileW(src, name, line, col);
-
-  BOOST_LOG_SEV(logger(), trace) << "eval script: " << src;
 
   return script->Run();
 }

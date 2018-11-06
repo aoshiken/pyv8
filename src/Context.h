@@ -48,26 +48,16 @@ private: // Embeded Data
     context->SetEmbedderData(index, v8::External::New(context->GetIsolate(), (void *)data));
   }
 
-  static logger_t &GetLogger(v8::Handle<v8::Context> context);
-
-  logger_t &logger(v8::Isolate *isolate = v8::Isolate::GetCurrent())
-  {
-    v8::HandleScope handle_scope(isolate);
-
-    auto context = m_context.Get(isolate);
-
-    return GetLogger(context);
-  }
 
 public:
-  CContext(v8::Handle<v8::Context> context, v8::Isolate *isolate = v8::Isolate::GetCurrent());
-  CContext(const CContext &context, v8::Isolate *isolate = v8::Isolate::GetCurrent());
-  CContext(py::object global, py::list extensions, v8::Isolate *isolate = v8::Isolate::GetCurrent());
-  ~CContext() { Dispose(false); }
+  CContext(v8::Handle<v8::Context> context, v8::Isolate *isolate = util_get_isolate());
+  CContext(const CContext &context, v8::Isolate *isolate = util_get_isolate());
+  CContext(py::object global, py::list extensions, v8::Isolate *isolate = util_get_isolate());
+  ~CContext() { Dispose(); }
 
-  void Dispose(bool disposed = true, v8::Isolate *isolate = v8::Isolate::GetCurrent());
+  void Dispose();
 
-  inline v8::Handle<v8::Context> Context(v8::Isolate *isolate = v8::Isolate::GetCurrent()) const { return m_context.Get(isolate); }
+  inline v8::Handle<v8::Context> Context(v8::Isolate *isolate = util_get_isolate()) const { return m_context.Get(isolate); }
 
   py::object GetGlobal(void) const;
 
@@ -82,18 +72,11 @@ public:
   py::object Evaluate(const std::string &src, const std::string name = std::string(), int line = -1, int col = -1);
   py::object EvaluateW(const std::wstring &src, const std::string name = std::string(), int line = -1, int col = -1);
 
-  static py::object GetEntered(v8::Isolate *isolate = v8::Isolate::GetCurrent());
-  static py::object GetCurrent(v8::Isolate *isolate = v8::Isolate::GetCurrent());
-  static py::object GetCalling(v8::Isolate *isolate = v8::Isolate::GetCurrent());
+  static py::object GetEntered( void );
+  static py::object GetCurrent(v8::Isolate *isolate = util_get_isolate());
+  static py::object GetCalling(v8::Isolate *isolate = util_get_isolate());
 
-  static bool InContext(v8::Isolate *isolate = v8::Isolate::GetCurrent()) { return isolate->InContext(); }
-
-  static logger_t &Logger(v8::Isolate *isolate = v8::Isolate::GetCurrent())
-  {
-    v8::HandleScope handle_scope(isolate);
-
-    return GetLogger(isolate->GetCurrentContext());
-  }
+  static bool InContext(v8::Isolate *isolate = util_get_isolate()) { return isolate->InContext(); }
 
   static void Expose(void);
 };

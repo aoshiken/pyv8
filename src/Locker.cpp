@@ -47,5 +47,5 @@ void CLocker::leave(void)
 
 bool CLocker::IsLocked()
 {
-  return v8::Locker::IsLocked(m_isolate->GetIsolate());
+  return v8::Locker::IsLocked( util_get_isolate() );
 }

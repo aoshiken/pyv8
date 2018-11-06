@@ -85,7 +85,7 @@ void CDebug::SendCommand(const std::string& cmd)
 
 void CDebug::OnDebugEvent(const v8::Debug::EventDetails& details)
 {
-  v8::HandleScope scope(v8::Isolate::GetCurrent());
+  v8::HandleScope scope(util_get_isolate());
   CDebug *pThis;
 
   BEGIN_HANDLE_JAVASCRIPT_EXCEPTION
@@ -122,7 +122,7 @@ void CDebug::OnDebugMessage(const v8::Debug::Message& message)
 {
   if (GetInstance().m_onDebugMessage.is_none()) return;
 
-  v8::HandleScope scope(v8::Isolate::GetCurrent());
+  v8::HandleScope scope(util_get_isolate());
 
   v8::String::Utf8Value str(message.GetJSON());
 

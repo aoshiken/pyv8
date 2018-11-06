@@ -12,7 +12,18 @@ class CIsolateBase
 protected:
   v8::Isolate *m_isolate;
 
-  CIsolateBase(v8::Isolate *isolate) : m_isolate(isolate) { assert(isolate); }
+  CIsolateBase(v8::Isolate *isolate)
+  {
+      if ( isolate == NULL )
+      {
+        v8::Isolate::CreateParams params;
+        params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+        //fprintf(stderr,"CIsolateBase constructor y isolate %p\n", isolate );fflush(stderr);
+        this->m_isolate = v8::Isolate::New(params);
+    }
+      else
+          this->m_isolate = isolate;
+  }
   virtual ~CIsolateBase() = default;
 
 public: // Operators
@@ -50,7 +61,6 @@ protected: // Data Slots
 public: // Internal Properties
   inline v8::Isolate *GetIsolate(void) const { return m_isolate; }
 
-  logger_t &Logger(void);
 };
 
 class CIsolateWrapper : public CIsolateBase
@@ -66,22 +76,16 @@ public: // Properties
 public: // Methods
   void Enter(void)
   {
-    BOOST_LOG_SEV(Logger(), trace) << "enter isolate";
-
     m_isolate->Enter();
   }
 
   void Leave(void)
   {
-    BOOST_LOG_SEV(Logger(), trace) << "exit isolate";
-
     m_isolate->Exit();
   }
 
   void Dispose(void)
   {
-    BOOST_LOG_SEV(Logger(), trace) << "destroy isolate";
-
     m_isolate->Dispose(); // delete m_isolate;
   }
 
@@ -102,7 +106,7 @@ public:
   virtual ~CIsolate() = default;
 
 public: // Internal Properties
-  static CIsolate Current(void) { return CIsolate(v8::Isolate::GetCurrent()); }
+  static CIsolate Current(void) { return CIsolate( util_get_isolate() ); }
 
   v8::Local<v8::ObjectTemplate> ObjectTemplate(void);
 };

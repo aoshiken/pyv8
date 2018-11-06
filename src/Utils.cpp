@@ -105,3 +105,21 @@ CPythonGIL::~CPythonGIL()
 {
   ::PyGILState_Release(m_state);
 }
+
+v8::Isolate *util_get_isolate( void )
+{
+    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+
+    if ( isolate == NULL )
+    {
+        v8::Isolate::CreateParams params;
+
+        params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+
+        isolate = v8::Isolate::New( params );
+
+        isolate->Enter();
+    }
+
+    return isolate;
+}

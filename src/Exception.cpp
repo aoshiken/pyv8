@@ -359,7 +359,7 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
   }
   else
   {
-    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    v8::Isolate *isolate = util_get_isolate();
     v8::HandleScope handle_scope(isolate);
 
     if (!ex.Exception().IsEmpty() && ex.Exception()->IsObject())
@@ -367,9 +367,9 @@ void ExceptionTranslator::Translate(CJavascriptException const& ex)
       v8::Handle<v8::Object> obj = ex.Exception()->ToObject();
 
       v8::MaybeLocal<v8::Value> exc_type = obj->GetPrivate(isolate->GetCurrentContext(),
-        v8::Private::New(isolate, v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_type")));
+        v8::Private::New(isolate, v8::String::NewFromUtf8(util_get_isolate(), "exc_type")));
       v8::MaybeLocal<v8::Value> exc_value = obj->GetPrivate(isolate->GetCurrentContext(),
-        v8::Private::New(isolate, v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "exc_value")));
+        v8::Private::New(isolate, v8::String::NewFromUtf8(util_get_isolate(), "exc_value")));
 
       if (!exc_type.IsEmpty() && !exc_value.IsEmpty())
       {

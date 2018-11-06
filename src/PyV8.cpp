@@ -31,7 +31,7 @@ static void load_external_data(logger_t &logger)
   fs::path load_path = fs::absolute(fs::path(filename).parent_path() / "v8");
 
 #ifdef V8_I18N_SUPPORT
-  fs::path icu_data_path = load_path / "icudtl.dat";
+  fs::path icu_data_path = "/usr/local/lib/icudtl.dat";
 
   if (v8::V8::InitializeICUDefaultLocation(filename, icu_data_path.c_str()))
   {
@@ -44,7 +44,7 @@ static void load_external_data(logger_t &logger)
 #endif
 
 #ifdef V8_USE_EXTERNAL_STARTUP_DATA
-  fs::path startup_data_path = load_path / "*.bin";
+  fs::path startup_data_path = "/usr/local/lib/*_blob.bin";
 
   BOOST_LOG_SEV(logger, info) << "loading external snapshot from " << startup_data_path.c_str() << "...";
 

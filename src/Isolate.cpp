@@ -28,22 +28,9 @@ void CManagedIsolate::Expose(void)
                                                                     py::objects::pointer_holder<CIsolateWrapperPtr, CIsolateWrapper>>>();
 }
 
-logger_t &CIsolateBase::Logger(void)
-{
-    auto logger = GetData<logger_t>(DataSlots::LoggerIndex, [this]() {
-        std::auto_ptr<logger_t> logger(new logger_t());
-
-        logger->add_attribute(ISOLATE_ATTR, attrs::constant<const v8::Isolate *>(m_isolate));
-
-        return logger.release();
-    });
-
-    return *logger;
-}
-
 py::object CIsolateWrapper::GetCurrent(void)
 {
-    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    v8::Isolate *isolate = util_get_isolate();
 
     v8::HandleScope handle_scope(isolate);
 
@@ -53,7 +40,7 @@ py::object CIsolateWrapper::GetCurrent(void)
 
 CIsolate::CIsolate(v8::Isolate *isolate) : CIsolateWrapper(isolate)
 {
-    BOOST_LOG_SEV(Logger(), trace) << "isolate wrapped";
+    //fprintf(stderr, "isolate wrapped\n" ); fflush(stderr);
 }
 
 v8::Local<v8::ObjectTemplate> CIsolate::ObjectTemplate(void)
@@ -69,13 +56,10 @@ v8::Local<v8::ObjectTemplate> CIsolate::ObjectTemplate(void)
 
 CManagedIsolate::CManagedIsolate() : CIsolateWrapper(CreateIsolate())
 {
-    BOOST_LOG_SEV(Logger(), trace) << "isolate created";
 }
 
 CManagedIsolate::~CManagedIsolate(void)
 {
-    BOOST_LOG_SEV(Logger(), trace) << "isolate destroyed";
-
     ClearDataSlots();
 
     m_isolate->Dispose();
