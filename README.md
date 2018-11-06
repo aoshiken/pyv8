@@ -1,5 +1,5 @@
-=DISCLAIMER
-The following instructions have been tested on Debian Stretch x64 *ONLY*, YMMV.
+## DISCLAIMER
+The following instructions have been tested on Debian Stretch x64 **ONLY**, YMMV.
 
 The PyV8 library has been built with the following assumptions:
 - The Google "depot tools" used for setup V8 will be cloned under the folder `/usr/local/src/depot_tools`
@@ -7,14 +7,13 @@ The PyV8 library has been built with the following assumptions:
 - This PyV8 repository will be cloned into `/usr/local/src/pyv8`
 
 
-=APT PACKAGES
+### APT PACKAGES
 ```
 # apt-get install git g++ gcc libboost-dev libboost-system-dev libboost-python-dev libboost-filesystem-dev libboost-log-dev libboost-regex-dev libboost-thread-dev libboost-timer-dev libboost-serialization-dev libboost-iostreams-dev libboost-atomic-dev libboost-chrono-dev
 ```
 
 
-=HOW TO BUILD THE V8 LIBRARIES
-
+### HOW TO BUILD THE V8 LIBRARIES
 
 Clone the "depot tools" repository and add it to the path:
 ```
@@ -23,7 +22,7 @@ root@dev-x64:/usr/local/src#
 root@dev-x64:/usr/local/src# export PATH=$PATH:/usr/local/src/depot_tools
 ```
 
-Create the V8 compiling folder and clone the V8 repository using the `depot_tools`::
+Create the V8 compiling folder and clone the V8 repository using the `depot_tools`:
 ```
 root@dev-x64:/usr/local/src# mkdir v8-compiling-folder
 root@dev-x64:/usr/local/src# cd v8-compiling-folder/
@@ -83,7 +82,7 @@ V8 version 5.8.110 [sample shell]
 ```
 
 Arrived here our V8 v5.8.110 engine has been correctly built and tested but we need it as a shared library for being used from PyV8.
-Let's compile it::
+Let's compile it:
 ```
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# make x64.release -j4 library=shared werror=no
 [...]
@@ -107,12 +106,12 @@ root@dev-x64:/usr/local/src/v8-compiling-folder/v8# ls -l out/x64.release/lib.ta
 -rwxr-xr-x 2 root root 19107152 Oct 17 17:23 libv8.so
 ```
 
-Copy the includes needed for compilation of external programs/libraries (like PyV8):
+Copy the header files needed for compilation of external programs/libraries (like PyV8):
 ```
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# cp -vR include/* /usr/include/
 ```
 
-Copy the libraries
+...the libraries...
 ```
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# cp -v out/x64.release/lib.target/lib*.so /usr/local/lib/
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# cp -v out/x64.release/obj.target/src/lib*.a /usr/local/lib/
@@ -120,26 +119,29 @@ root@dev-x64:/usr/local/src/v8-compiling-folder/v8# cp -v out/x64.release/obj.ta
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# ldconfig -v
 ```
 
-Copy the JS natives
+...and the JS natives...
 ```
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# cp -v out/x64.release/natives_blob.bin /usr/local/lib
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# cp -v out/x64.release/snapshot_blob.bin /usr/local/lib
 root@dev-x64:/usr/local/src/v8-compiling-folder/v8# cp -v out/x64.release/icudtl.dat /usr/local/lib
 ```
 
-=BUILD AND INSTALL PYV8
+### BUILD AND INSTALL PYV8
 
 The usual way...
 ```
 root@dev-x64:/usr/local/src/pyv8# python setup.py clean && python setup.py build && python setup.py install
 ```
 
-Minimal tests:
+Minimal test1:
 ```
 root@dev-x64:/usr/local/src/pyv8# cd /tmp ; python /usr/local/src/pyv8/demos/helloworld.py ; cd -
 Hello World
 /usr/local/src/pyv8
-root@dev-x64:/usr/local/src/pyv8#
+```
+
+Minimal test2:
+```
 root@dev-x64:/usr/local/src/pyv8# cd ..
 root@dev-x64:/usr/local/src# python
 Python 2.7.13 (default, Nov 24 2017, 17:33:09)
@@ -153,7 +155,3 @@ Type "help", "copyright", "credits" or "license" for more information.
 ...
 3
 ```
-
-
-
-
